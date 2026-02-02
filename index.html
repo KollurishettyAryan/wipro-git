@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoMCQ - Smart Question Generator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>🧠 AutoMCQ</h1>
+    <p>Upload your PDF notes and get smart MCQs with difficulty levels</p>
+    
+    <form id="uploadForm">
+      <input type="file" id="pdfFile" accept=".pdf" required>
+      <button type="submit">Generate Questions</button>
+    </form>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const file = document.getElementById('pdfFile').files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/generate', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      const output = document.getElementById('output');
+      output.innerHTML = "";
+
+      data.forEach((item, i) => {
+        output.innerHTML += `
+          <div class="card">
+            <h3>Q${i+1} (${item.difficulty})</h3>
+            <pre>${item.question}</pre>
+          </div>
+        `;
+      });
+    });
+  </script>
+</body>
+</html>
